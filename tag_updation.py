@@ -2,10 +2,11 @@ import re
 import boto3
 import sys
 
-session = boto3.Session(profile_name='463257850487_PowerUserAccess', region_name='us-east-1')
-ec2 = session.client('ec2')
-s3 = session.client('s3')
+#session = boto3.Session(profile_name='463257850487_PowerUserAccess', region_name='us-east-1')
+#ec2 = session.client('ec2')
+#s3 = session.client('s3')
 rds = boto3.client('rds')
+ec2 = boto3.client('ec2')
 #id = boto3.client('sts').get_caller_identity().get('Account')
 
 def tagging(value):
@@ -22,26 +23,25 @@ def ec2_tagging_fix():
       for instances in reservation['Instances']:
         for items in instances['Tags']:
           if items['Key'] == 'Application_ID':
-            if re.match(r'^APM\d{7}$', items['Value']):
+            if not re.match(r'^APM\d{7}$', items['Value']):
                 print(items['Value'])
-            else:
-                if len(items['Value']) < 10:
-                    new_str = tagging(items['Value'])
-                    ec2.delete_tags(
-                      Resources=[instances['InstanceId']],
-                      Tags=[{"Key": "Application_ID"}]
-                    )
-                    print("updating tags")
-                    ec2.create_tags(
-                      Resources=[instances['InstanceId']],
-                      Tags=[
-                        {
-                          'Key': 'Application_ID',
-                          'Value': new_str
-                        }
-                      ]
-                    )
-                    break
+            if re.match(r'^APM', items['Value']) and len(items['Value']) < 10:
+                new_str = tagging(items['Value'])
+                ec2.delete_tags(
+                  Resources=[instances['InstanceId']],
+                  Tags=[{"Key": "Application_ID"}]
+                )
+                print("updating tags")
+                ec2.create_tags(
+                  Resources=[instances['InstanceId']],
+                  Tags=[
+                    {
+                      'Key': 'Application_ID',
+                      'Value': new_str
+                    }
+                  ]
+                )
+                break
 
 def s3_tagging_fix():
     response = s3.list_buckets()['Buckets']
@@ -67,8 +67,26 @@ def s3_tagging_fix():
                     break
 
 def rds_tagging_fix():
-  db = rds.describe_db_instances()['DBInstances']
+    dbs = rds.describe_db_instances()['DBInstances']
+    for db in dbs:
+        for tag in db['TagList']:
+            if tag['Key'] == 'Application_ID':
+                if not re.match(r'^APM\d{7}$', tag['Value']):
+                    print("Tag Value of {} is {}".format(db['DBInstanceIdentifier'], tag['Value']))
+                if re.match(r'^APM', tag['Value']) and len(tag['Value']) < 10:
+                    new_str = tagging(tag['Value'])
+                    print("updating tags value {} from {} to {}".format(db['DBInstanceIdentifier'], tag['Value'], new_str))
+                    rds.add_tags_to_resource(
+                      ResourceName=db['DBInstanceArn'],
+                      Tags=[
+                        {
+                          'Key': 'Application_ID',
+                          'Value': new_str
+                        },
+                      ]
+                    )
 
 
-#ec2_tagging_fix()
-s3_tagging_fix()
+rds_tagging_fix()
+ec2_tagging_fix()
+#s3_tagging_fix()
