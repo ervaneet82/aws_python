@@ -139,3 +139,7 @@ os.environ.pop('AWS_SESSION_TOKEN', None)
 
 print("AWS credentials unset.")
 
+aws ecs describe-tasks --cluster your-cluster-name --query 'tasks[].taskArn' --output json | jq -r '.[] | split("/") | last'
+
+aws ecs stop-task --cluster your-cluster-name --task your-task-id
+
