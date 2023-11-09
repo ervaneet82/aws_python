@@ -95,3 +95,47 @@ except Exception as e:
         TransitGatewayRouteTableId='tgw-rtb-0123456789abcdef0'
     )
 
+
+Assume Role
+
+import boto3
+
+# Create an STS client
+sts_client = boto3.client('sts')
+
+# The ARN of the role you want to assume
+role_to_assume_arn = 'arn:aws:iam::account-id-with-role:role/RoleName'
+
+# The name you assign to the temporary credentials
+role_session_name = 'YourSessionName'
+
+# Assume the role
+try:
+    response = sts_client.assume_role(
+        RoleArn=role_to_assume_arn,
+        RoleSessionName=role_session_name
+    )
+
+    # Extract temporary credentials
+    credentials = response['Credentials']
+
+    print("Assumed role successfully. Temporary credentials:")
+    print("Access Key:", credentials['AccessKeyId'])
+    print("Secret Key:", credentials['SecretAccessKey'])
+    print("Session Token:", credentials['SessionToken'])
+
+except Exception as e:
+    print("Error assuming role:", str(e))
+
+
+Unset the variables
+
+import os
+
+# Unset AWS credentials
+os.environ.pop('AWS_ACCESS_KEY_ID', None)
+os.environ.pop('AWS_SECRET_ACCESS_KEY', None)
+os.environ.pop('AWS_SESSION_TOKEN', None)
+
+print("AWS credentials unset.")
+
