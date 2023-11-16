@@ -95,6 +95,27 @@ except Exception as e:
         TransitGatewayRouteTableId='tgw-rtb-0123456789abcdef0'
     )
 
+### List of shared invitation
+
+ response = ram_client.get_resource_share_invitations()
+        invitations = response.get('resourceShareInvitations', [])
+
+        if invitations:
+            print("Resource Share Invitations:")
+            for invitation in invitations:
+                invitation_id = invitation['resourceShareInvitationArn'].split('/')[-1]
+                print(f"Invitation ID: {invitation_id}")
+                print(f"Sender Account ID: {invitation['senderAccountId']}")
+                print(f"Resource Share Name: {invitation['resourceShareName']}")
+                print(f"Status: {invitation['status']}")
+                print("\n---\n")
+
+### Resource Invitation Acceptance
+
+  response = ram_client.accept_resource_share_invitation(
+            resourceShareInvitationArn=share_invitation_id
+        )
+
 
 Assume Role
 
