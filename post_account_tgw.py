@@ -50,7 +50,8 @@ def list_subnets_of_vpc(vpc_id):
     subnets = response['Subnets']
     for subnet in subnets:
         subnet_ids.append(subnet['SubnetId'])
-        
+
+print(subnet_ids)
 
 
 TGW Attachment
