@@ -32,6 +32,26 @@ try:
 except Exception as e:
     print("Error accepting Transit Gateway Attachment:", str(e))
 
+list of subnets of vpc
+
+import boto3
+
+# Create an EC2 client
+ec2 = boto3.client('ec2')
+
+# Retrieve all VPCs
+response = ec2.describe_vpcs()
+vpcs = response['Vpcs']
+vpc_id = vpc['VpcId']
+subnet_ids = []
+def list_subnets_of_vpc(vpc_id):
+    # Retrieve subnets for the specified VPC
+    response = ec2.describe_subnets(Filters=[{'Name': 'vpc-id', 'Values': [vpc_id]}])
+    subnets = response['Subnets']
+    for subnet in subnets:
+        subnet_ids.append(subnet['SubnetId'])
+        
+
 
 TGW Attachment
 
@@ -43,21 +63,19 @@ tgw_client = boto3.client('ec2', region_name='your_region')
 
 # Example Transit Gateway Attachment parameters
 transit_gateway_id = ''
-vpc_id = ''
-subnet_id = ''
+
 
 # Create Transit Gateway Attachment
 try:
     response = ec2_client.create_transit_gateway_vpc_attachment(
         TransitGatewayId=transit_gateway_id,
         VpcId=vpc_id,
-        SubnetIds=[subnet_id],
+        SubnetIds=subnet_ids,
         TagSpecifications=[
             {
                 'ResourceType': 'transit-gateway-attachment',
                 'Tags': [
                     {'Key': 'Name', 'Value': 'YourAttachmentName'}
-                    # Add more tags as needed
                 ]
             },
         ]
