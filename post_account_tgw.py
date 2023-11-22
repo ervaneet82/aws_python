@@ -41,16 +41,20 @@ ec2 = boto3.client('ec2')
 
 # Retrieve all VPCs
 response = ec2.describe_vpcs()
-vpcs = response['Vpcs']
+vpc_id = ""
+for vpc in response['Vpcs']:
+    vpc_id = vpc['VpcId']
+    
 vpc_id = vpc['VpcId']
 subnet_ids = []
+
 def list_subnets_of_vpc(vpc_id):
     # Retrieve subnets for the specified VPC
     response = ec2.describe_subnets(Filters=[{'Name': 'vpc-id', 'Values': [vpc_id]}])
     subnets = response['Subnets']
     for subnet in subnets:
         subnet_ids.append(subnet['SubnetId'])
-
+list_subnets_of_vpc(vpc_id)
 print(subnet_ids)
 
 
