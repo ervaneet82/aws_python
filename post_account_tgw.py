@@ -1,17 +1,28 @@
 import boto3
-ram_client = boto3.client('ram', region_name='your-region')
-resource_share_arn = 'arn:aws:ram:your-region:your-account-id:resource-share/your-resource-share-id'
-resource_share_details = ram_client.get_resource_share(resourceShareArn=resource_share_arn)
-new_account_id = 'new-account-id'
-resource_share_details['resourceShare']['principals'][0]['resourceShareArn'] = f'arn:aws:ram:your-region:{new_account_id}:resource-share/your-resource-share-id'
-ram_client.update_resource_share(
-    resourceShareArn=resource_share_arn,
-    allowExternalPrincipals=True,
-    resourceShareName='your-updated-resource-share-name',
-    principals=[{'resourceShareArn': f'arn:aws:ram:your-region:{new_account_id}:resource-share/your-resource-share-id'}],
-    version=resource_share_details['resourceShare']['version']
+import os
+
+stsclient = boto3.client('sts')
+
+assumed_role_object = stsclient.assume_role(
+    RoleArn="<arn>",
+    RoleSessionName="AssumeRoleSession1")
+
+credentials = assumed_role_object['Credentials']
+
+ram_client = boto3.client('ram',
+                      aws_access_key_id=credentials['AccessKeyId'],
+                      aws_secret_access_key=credentials['SecretAccessKey'],
+                      aws_session_token=credentials['SessionToken'],
+                      )
+
+
+response = ram_client.associate_resource_share(
+    resourceShareArn='<RAM_ARN>',
+    resourceArns=['<TransitGateway_ARN'],
+    principals=['AccountID'],
 )
 
+print(response)
 
 TGW Acceptance
 
