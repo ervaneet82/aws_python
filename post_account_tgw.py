@@ -100,6 +100,32 @@ try:
 except Exception as e:
     print("Error creating Transit Gateway Attachment:", str(e))
 
+
+#TGW Attachment ID
+
+import boto3
+
+# Create an EC2 client
+ec2_client = boto3.client('ec2')
+
+# Specify the Transit Gateway ID
+transit_gateway_id = 'your-transit-gateway-id'
+
+# Describe Transit Gateway attachments
+response = ec2_client.describe_transit_gateway_attachments(
+    Filters=[
+        {
+            'Name': 'transit-gateway-id',
+            'Values': [transit_gateway_id]
+        },
+    ]
+)
+
+# Extract and print Transit Gateway attachment IDs
+for attachment in response['TransitGatewayAttachments']:
+    attachment_id = attachment['TransitGatewayAttachmentId']
+    print(f"Transit Gateway Attachment ID: {attachment_id}")
+
 TGW Route propgation 
 
 import boto3
