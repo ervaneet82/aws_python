@@ -126,6 +126,32 @@ for attachment in response['TransitGatewayAttachments']:
     attachment_id = attachment['TransitGatewayAttachmentId']
     print(f"Transit Gateway Attachment ID: {attachment_id}")
 
+
+### TGW create route association
+
+import boto3
+
+# Specify the Transit Gateway ID
+transit_gateway_id = 'your_transit_gateway_id'
+
+# Create a Transit Gateway route table
+response = ec2_client.create_transit_gateway_route_table(TransitGatewayId=transit_gateway_id)
+
+# Get the ID of the newly created route table
+route_table_id = response['TransitGatewayRouteTable']['TransitGatewayRouteTableId']
+
+# Specify the attachment ID to associate with the route table
+attachment_id = 'your_attachment_id'
+
+# Associate the route table with the attachment
+ec2_client.associate_transit_gateway_route_table(
+    TransitGatewayRouteTableId=route_table_id,
+    TransitGatewayAttachmentId=attachment_id
+)
+
+print(f"Route table {route_table_id} created and associated with attachment {attachment_id}")
+
+
 TGW Route propgation 
 
 import boto3
