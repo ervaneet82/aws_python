@@ -134,11 +134,11 @@ import boto3
 # Specify the Transit Gateway ID
 transit_gateway_id = 'your_transit_gateway_id'
 
-# Create a Transit Gateway route table
-response = ec2_client.create_transit_gateway_route_table(TransitGatewayId=transit_gateway_id)
+# get transit gateway id
+response = ec2.describe_transit_gateway_route_tables(TransitGatewayId=transit_gateway_id)
 
-# Get the ID of the newly created route table
-route_table_id = response['TransitGatewayRouteTable']['TransitGatewayRouteTableId']
+route_table_id = response['TransitGatewayRouteTables'][0]['TransitGatewayRouteTableId']
+print(f"Transit Gateway Route Table ID: {route_table_id}")
 
 # Specify the attachment ID to associate with the route table
 attachment_id = 'your_attachment_id'
