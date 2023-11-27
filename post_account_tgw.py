@@ -188,7 +188,7 @@ for attachment_id in attachment_ids:
 # Create Transit Gateway Attachment Association
     ec2_client.associate_transit_gateway_route_table(
         TransitGatewayAttachmentId=attachment_id,
-        TransitGatewayRouteTableId='tgw-rtb-0123456789abcdef0'
+        TransitGatewayRouteTableId='<>'
     )
 
 ### List of shared invitation
