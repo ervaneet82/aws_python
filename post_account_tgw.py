@@ -152,27 +152,37 @@ ec2_client.associate_transit_gateway_route_table(
 print(f"Route table {route_table_id} created and associated with attachment {attachment_id}")
 
 
-TGW Route propgation 
+
+
+### Enable TGW Route Attachment Propagation
 
 import boto3
 
-# Create EC2 client
-ec2_client = boto3.client('ec2', region_name='your_region')
+# Create a Boto3 Transit Gateway client
+client = boto3.client('ec2', region_name='your_region')
 
-# Example Transit Gateway ID and Route Table ID
-transit_gateway_id = 'tgw-0123456789abcdef0'
-route_table_id = 'tgw-rtb-0123456789abcdef0'
+# Specify the Transit Gateway ID
+transit_gateway_id = 'your_transit_gateway_id'
 
-# Create Transit Gateway Route Table Propagation
-try:
-    response = ec2_client.create_transit_gateway_route_table_propagation(
-        TransitGatewayRouteTableId=route_table_id,
-        TransitGatewayAttachmentId='tgw-attach-0123456789abcdef0',
-        TransitGatewayId=transit_gateway_id
+# Specify the attachment IDs (resource IDs of VPCs, VPNs, etc.)
+attachment_ids = ['attachment_id_1', 'attachment_id_2']
+
+# Enable route propagation for the specified attachments
+for attachment_id in attachment_ids:
+    response = client.enable_transit_gateway_route_table_propagation(
+        TransitGatewayRouteTableId='your_route_table_id',
+        TransitGatewayAttachmentId=attachment_id
     )
-    print("Transit Gateway Route Table Propagation created successfully:", response)
-except Exception as e:
-    print("Error creating Transit Gateway Route Table Propagation:", str(e))
+    print(f"Enabled route propagation for attachment {attachment_id}")
+
+# Disable route propagation for the specified attachments
+for attachment_id in attachment_ids:
+    response = client.disable_transit_gateway_route_table_propagation(
+        TransitGatewayRouteTableId='your_route_table_id',
+        TransitGatewayAttachmentId=attachment_id
+    )
+    print(f"Disabled route propagation for attachment {attachment_id}")
+
 
 
 # Create Transit Gateway Attachment Association
