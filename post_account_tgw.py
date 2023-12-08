@@ -273,34 +273,30 @@ region = 'your-region'
 # Create a Boto3 RAM client
 ram_client = boto3.client('ram', region_name=region)
 
-# Get a list of resource shares
-response = ram_client.get_resource_shares()
+# Get the list of resources shared with the current account
+response_resources = ram_client.get_resource_shares(
+    resourceOwner='SELF'
+)
 
-# Extract associated resource information
-associated_resources = []
-
-for resource_share in response['resourceShares']:
-    # Get the resources associated with each resource share
-    share_id = resource_share['resourceShareArn']
+# Extract resource information
+shared_resources = response_resources.get('resources', [])
+for resource in shared_resources:
+    resource_name = resource.get('name', 'N/A')
+    resource_type = resource.get('resourceType', 'N/A')
+    resource_arn = resource.get('resourceArn', 'N/A')
     
-    # Get associated resources
-    associated_resource_response = ram_client.list_resources(
-        resourceShareArns=[share_id]
-    )
+    print(f"Resource Name: {resource_name}, Resource Type: {resource_type}, Resource ARN: {resource_arn}")
+
+# Get the list of principals (accounts) that the current account has shared resources with
+response_principals = ram_client.get_resource_share_associations(
+    associationType='PRINCIPAL',
+    resourceOwner='SELF'
+)
+
+# Extract principal information
+shared_principals = response_principals.get('resourceShareAssociations', [])
+for principal in shared_principals:
+    principal_account_id = principal.get('associatedEntity', {}).get('id', 'N/A')
+    principal_type = principal.get('associatedEntity', {}).get('type', 'N/A')
     
-    resources = associated_resource_response.get('resources', [])
-    
-    for resource in resources:
-        resource_info = {
-            'ResourceType': resource['resourceType'],
-            'ResourceId': resource['resourceId'],
-            'ResourceRegion': resource['resourceRegion']
-        }
-        associated_resources.append(resource_info)
-
-# Print the list of associated resources
-print("Associated Resources:")
-for resource in associated_resources:
-    print(resource)
-
-
+    print(f"Principal Account ID: {principal_account_id}, Principal Type: {principal_type}")
