@@ -262,3 +262,45 @@ aws ecs list-tasks --cluster your-cluster-name --query 'taskArns' --output text
 
 aws ecs stop-task --cluster your-cluster-name --task your-task-id
 
+
+Get of list of resource in RAM
+
+import boto3
+
+# Replace 'your-region' with your actual AWS region
+region = 'your-region'
+
+# Create a Boto3 RAM client
+ram_client = boto3.client('ram', region_name=region)
+
+# Get a list of resource shares
+response = ram_client.get_resource_shares()
+
+# Extract associated resource information
+associated_resources = []
+
+for resource_share in response['resourceShares']:
+    # Get the resources associated with each resource share
+    share_id = resource_share['resourceShareArn']
+    
+    # Get associated resources
+    associated_resource_response = ram_client.list_resources(
+        resourceShareArns=[share_id]
+    )
+    
+    resources = associated_resource_response.get('resources', [])
+    
+    for resource in resources:
+        resource_info = {
+            'ResourceType': resource['resourceType'],
+            'ResourceId': resource['resourceId'],
+            'ResourceRegion': resource['resourceRegion']
+        }
+        associated_resources.append(resource_info)
+
+# Print the list of associated resources
+print("Associated Resources:")
+for resource in associated_resources:
+    print(resource)
+
+
