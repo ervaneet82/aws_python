@@ -1,0 +1,18 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      python: 3.11
+  pre_build:
+    commands:
+      - which pip3
+      - pip3 install boto3
+    #  - chmod +x post_account.sh
+  build:
+    commands:
+      - echo Build started on `date`
+      - python3 allow_account_in_ram.py
+  post_build:
+    commands:
+      - echo Build completed on `date`
