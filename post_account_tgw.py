@@ -300,3 +300,28 @@ for principal in shared_principals:
     principal_type = principal.get('associatedEntity', {}).get('type', 'N/A')
     
     print(f"Principal Account ID: {principal_account_id}, Principal Type: {principal_type}")
+
+
+IAM crossAccount
+
+# iam.tf
+
+resource "aws_iam_role" "cross_account_role" {
+  name = "cross-account-role"
+  
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [{
+      Action = "sts:AssumeRole",
+      Effect = "Allow",
+      Principal = {
+        AWS = "arn:aws:iam::ACCOUNT_B_ID:root"
+      }
+    }]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "cross_account_policy" {
+  policy_arn = "arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess" # or any other policy
+  role       = aws_iam_role.cross_account_role.name
+}
