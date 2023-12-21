@@ -1,0 +1,41 @@
+cat index.html.template
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Dockerized App</title>
+</head>
+<body>
+    <h1>${GREETING}</h1>
+    <p>This is a Dockerized Nginx web application.</p>
+</body>
+</html>
+
+cat entrypoint.sh
+#!/bin/bash
+
+# Use envsubst to replace placeholders in the template file
+envsubst < /usr/share/nginx/html/index.html.template > /usr/share/nginx/html/index.html
+
+# Start Nginx in the foreground
+exec nginx -g 'daemon off;'
+
+
+cat Dockerfile
+# Use the official Nginx base image
+FROM nginx:latest
+
+# Copy HTML file to the Nginx document root
+COPY index.html.template /usr/share/nginx/html/
+
+COPY entrypoint.sh /
+
+# Make the entrypoint script executable
+RUN chmod +x /entrypoint.sh
+
+# Expose port 80
+EXPOSE 80
+
+
+CMD ["/entrypoint.sh"]
