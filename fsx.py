@@ -22,3 +22,34 @@ def describe_fsx_instances():
 
 if __name__ == "__main__":
     describe_fsx_instances()
+
+import boto3
+
+def describe_eni_security_groups(eni_id):
+    # Create EC2 client
+    ec2_client = boto3.client('ec2')
+
+    # Describe the ENI
+    response = ec2_client.describe_network_interfaces(NetworkInterfaceIds=[eni_id])
+
+    # Extract security group IDs associated with the ENI
+    security_group_ids = response['NetworkInterfaces'][0]['Groups']
+
+    # Extract security group names using the security group IDs
+    security_group_names = []
+    for group_id in security_group_ids:
+        sg_response = ec2_client.describe_security_groups(GroupIds=[group_id['GroupId']])
+        security_group_names.append(sg_response['SecurityGroups'][0]['GroupName'])
+
+    return security_group_names
+
+if __name__ == "__main__":
+    # Replace 'your_eni_id' with the actual ENI ID
+    eni_id = 'your_eni_id'
+
+    # Get security group names associated with the ENI
+    sg_names = describe_eni_security_groups(eni_id)
+
+    # Print the results
+    print(f"Security Group Names associated with ENI {eni_id}: {sg_names}")
+
