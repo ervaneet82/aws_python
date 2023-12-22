@@ -45,3 +45,11 @@ resource "aws_security_group" "example" {
     }
   }
 }
+
+resource "aws_db_snapshot" "example_snapshot" {
+  db_instance_identifier = aws_db_instance.example.identifier
+  identifier            = "my-db-snapshot"
+  tags                  = aws_db_instance.example.tags
+
+  copy_tags_to_snapshot = true
+}
