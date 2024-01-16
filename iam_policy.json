@@ -1,0 +1,21 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Principal": {
+        "Service": [
+          "iam.amazonaws.com",
+          "lambda.amazonaws.com"
+        ]
+      },
+      "Action": [
+        "iam:List*",
+        "iam:Get*",
+        "iam:UpdateRole",
+        "iam:UpdatePolicy"
+      ],
+      "Resource": *"
+    }
+  ]
+}
