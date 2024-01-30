@@ -325,3 +325,6 @@ resource "aws_iam_role_policy_attachment" "cross_account_policy" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess" # or any other policy
   role       = aws_iam_role.cross_account_role.name
 }
+
+
+aws ec2 describe-transit-gateway-route-tables --max-items 10 --query "TransitGatewayRouteTables[*].{TransitGatewayRouteTableId:TransitGatewayRouteTableId, TransitGatewayId:TransitGatewayId, State:State, DefaultAssociationRouteTable:DefaultAssociationRouteTable, DefaultPropagationRouteTable:DefaultPropagationRouteTable}" --output text
