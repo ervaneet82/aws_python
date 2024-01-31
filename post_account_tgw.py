@@ -328,3 +328,39 @@ resource "aws_iam_role_policy_attachment" "cross_account_policy" {
 
 
 aws ec2 describe-transit-gateway-route-tables --max-items 10 --query "TransitGatewayRouteTables[*].{TransitGatewayRouteTableId:TransitGatewayRouteTableId, TransitGatewayId:TransitGatewayId, State:State, DefaultAssociationRouteTable:DefaultAssociationRouteTable, DefaultPropagationRouteTable:DefaultPropagationRouteTable}" --output text
+
+### RAM associated or not
+import boto3
+
+def check_resource_share_association(resource_share_arn, principal):
+    ram_client = boto3.client('ram')
+
+    try:
+        # Get the resource share associations for the specified resource share
+        response = ram_client.get_resource_share_associations(
+            resourceShareArn=resource_share_arn
+        )
+
+        # Check if the principal is associated with the resource share
+        for association in response.get('resourceShareAssociations', []):
+            if association['associatedEntity'] == principal:
+                return True
+
+        return False  # Principal is not associated
+
+    except Exception as e:
+        print(f"Error: {e}")
+        return False
+
+# Replace 'resource_share_arn' and 'principal' with your actual values
+resource_share_arn = 'arn:aws:ram:your-region:your-account:resource-share/resource-share-id'
+principal = 'arn:aws:iam::principal-account-id:root'
+
+# Check if the principal is associated with the resource share
+is_associated = check_resource_share_association(resource_share_arn, principal)
+
+if is_associated:
+    print(f"The resource share is associated with the principal.")
+else:
+    print(f"The resource share is not associated with the principal.")
+
