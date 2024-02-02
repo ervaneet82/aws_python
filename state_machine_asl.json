@@ -1,0 +1,58 @@
+{
+  "Comment": "Start CodePipeline Execution and Wait for Success",
+  "StartAt": "StartCodePipelineExecution",
+  "States": {
+    "StartCodePipelineExecution": {
+      "Type": "Task",
+      "Resource": "arn:aws:lambda:us-west-2:502433561161:function:2073320-codepipeline-status-check",
+      "ResultPath": "$.executionDetails",
+      "Next": "WaitForSuccess"
+    },
+    "WaitForSuccess": {
+      "Type": "Wait",
+      "Seconds": 5,
+      "Next": "CheckPipelineStatus"
+    },
+    "CheckPipelineStatus": {
+      "Type": "Task",
+      "Resource": "arn:aws:lambda:us-west-2:502433561161:function:2073320-codepipeline-status-check",
+      "InputPath": "$.executionDetails",
+      "ResultPath": "$.pipelineStatus",
+      "Next": "CheckStatusAndAct"
+    },
+    "CheckStatusAndAct": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "Variable": "$.pipelineStatus",
+          "StringEquals": "Succeeded",
+          "Next": "PipelineSucceeded"
+        },
+        {
+          "Variable": "$.pipelineStatus",
+          "StringEquals": "Failed",
+          "Next": "PipelineFailed"
+        },
+        {
+          "Variable": "$.pipelineStatus",
+          "StringEquals": "running",
+          "Next": "WaitForCompletion"
+        }
+      ],
+      "Default": "WaitForSuccess"
+    },
+    "PipelineSucceeded": {
+      "Type": "Succeed"
+    },
+    "PipelineFailed": {
+      "Type": "Fail",
+      "Error": "PipelineFailed",
+      "Cause": "The CodePipeline execution has failed."
+    },
+    "WaitForCompletion": {
+      "Type": "Wait",
+      "Seconds": 60,
+      "Next": "CheckPipelineStatus"
+    }
+  }
+}
