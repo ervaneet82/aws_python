@@ -364,3 +364,26 @@ if is_associated:
 else:
     print(f"The resource share is not associated with the principal.")
 
+
+Lambda to execute codepipline
+===================================
+import boto3
+
+def lambda_handler(event, context):
+    # Replace with your CodePipeline name
+    pipeline_name = 'your-codepipeline-name'
+
+    client = boto3.client('codepipeline')
+    try:
+        response = client.start_pipeline_execution(name=pipeline_name)
+        print(response)
+    except Exception as e:
+        print(f"Error starting pipeline: {e}")
+        raise
+
+    return {
+        'statusCode': 200,
+        'body': 'CodePipeline execution started successfully.'
+    }
+
+
