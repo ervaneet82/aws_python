@@ -26,7 +26,7 @@
         {
           "Variable": "$.pipelineStatus",
           "StringEquals": "Succeeded",
-          "Next": "PipelineSucceeded"
+          "Next": "Codepipeline"
         },
         {
           "Variable": "$.pipelineStatus",
@@ -40,6 +40,12 @@
         }
       ],
       "Default": "WaitForSuccess"
+    },
+    "Codepipeline": {
+      "Type": "Task",
+      "Resource": "arn:aws:lambda:us-west-2:502433561161:function:2073320-codepipeline-trigger",
+      "ResultPath": "$.executionDetails",
+      "Next": "PipelineSucceeded"
     },
     "PipelineSucceeded": {
       "Type": "Succeed"
