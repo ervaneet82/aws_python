@@ -1,0 +1,16 @@
+aws apigateway create-rest-api --name "MyAPI" --region <region>
+
+aws apigateway create-resource --rest-api-id <rest-api-id> --parent-id <parent-resource-id> --path-part <resource-path>
+
+aws apigateway put-method --rest-api-id <rest-api-id> --resource-id <resource-id> --http-method POST --authorization-type "NONE"
+
+
+aws apigateway put-integration --rest-api-id <rest-api-id> --resource-id <resource-id> --http-method POST --type AWS --integration-http-method POST --uri arn:aws:apigateway:<region>:lambda:path/2015-03-31/functions/<lambda-function-arn>/invocations
+
+
+aws apigateway create-deployment --rest-api-id <rest-api-id> --stage-name <stage-name>
+
+aws apigateway invoke-api --rest-api-id <rest-api-id> --resource-id <resource-id> --http-method POST --path "/<resource-path>" --body "<request-body>" --region <region> --no-verify-ssl
+
+
+aws lambda create-function --function-name <function-name> --runtime <runtime> --role <role-arn> --handler <handler> --zip-file fileb://<path/to/your/zipfile.zip>
