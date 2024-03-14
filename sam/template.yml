@@ -1,0 +1,28 @@
+Resources:
+  DynamoDbManager:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: DynamoDB/
+      Handler: index.handler
+      Runtime: java
+      Role: arn:aws:iam::313724444980:role/LambdaExecRole
+      Environment:
+        Variables:
+          table_name: !Ref LabTable
+      Events:
+        Rest:
+          Type: Api
+          Properties:
+            Path: '/dynamodbmanager'
+            Method: post
+  LabTable:
+    Type: AWS::Serverless::SimpleTable
+    Properties:
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
+
+Outputs:
+  DynamoDbManagerAPI:
+    Description: "API Gateway endpoint URL for Prod stage for the DynamoDB Manager Function"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/dynamodbmanager/"
