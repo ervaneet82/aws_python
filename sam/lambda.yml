@@ -1,0 +1,29 @@
+Resources:
+  ServerlessRestApiNew:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: dev
+      Cors:
+        AllowMethods: "'GET,POST,HEAD,OPTIONS'"
+        AllowHeaders: "'X-Forwarded-For,Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,Origin,Accept'"
+        AllowOrigin: !Sub "'*'"
+  
+  IDMOTPEngineController:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: xyz
+      CodeUri:
+        Bucket: !Sub 'ofg-datalake-${EnvironmentProfile}'
+        Key: athena-dynamo-connector/athena-dynamodb-2022.47.1.jar
+      Handler: com.ofg.idm.otpengine.handler.OTPEngineHandler::handleRequest
+      Runtime: java11
+      MemorySize: 1024
+      Timeout: 800
+      Policies:
+         - VPCAccessPolicy: {} 
+         # This policy gives permission for Lambdas to create/manage ENIs
+         # SAM Policy templates you can use: https://github.com/awslabs/serverless-application-model/blob/develop/examples/2016-10-31/policy_templates/all_policy_templates.yaml
+      Role:
+        Fn::GetAtt:
+        - LambdaExecutionRole
+        - Arn
