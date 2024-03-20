@@ -18,29 +18,27 @@ Parameters:
     MaxValue: '10000'
     ConstraintDescription: must be between 5 and 10000
 Resources:
-  IDMDevicePreference:
+  IPTRANSACTION:
     Type: AWS::DynamoDB::Table
-    DeletionPolicy: Retain
-    Properties:   
-      Tags: 
-      - Key: "IDMDevicePreference-IDM"
-        Value: "IDM"      
+    Properties:       
       AttributeDefinitions:
-      - AttributeName: "Username"
+      - AttributeName: "TransactionalId"
         AttributeType: "S"
-      - AttributeName: "DeviceId"
+      - AttributeName: "ApplicationId"
         AttributeType: "S"
-      - AttributeName: "TargetDevice"
+      - AttributeName: "IpBlockflag"
         AttributeType: "S"
+      - AttributeName: "CreatedTimestamp"
+        AttributeType: "S"         
       KeySchema:
-      - AttributeName: "Username"
+      - AttributeName: "TransactionalId"
         KeyType: "HASH"
-      - AttributeName: "DeviceId"
-        KeyType: "RANGE"
+      - AttributeName: "ApplicationId"
+        KeyType: "RANGE"                               
       ProvisionedThroughput:
         ReadCapacityUnits: !Ref 'ReadCapacityUnits'
         WriteCapacityUnits: !Ref 'WriteCapacityUnits'
-      TableName: "IDMDevicePreference"
+      TableName: "IPTRANSACTIONS"
       TimeToLiveSpecification:
         AttributeName: "ttl"
         Enabled: "true"
@@ -52,14 +50,16 @@ Resources:
       PointInTimeRecoverySpecification:
         PointInTimeRecoveryEnabled: "true"
       GlobalSecondaryIndexes:
-        - IndexName: "TargetDevice-index"
+        - IndexName: "UserId-AppId-index"
           KeySchema:
-          - AttributeName: "TargetDevice"
-            KeyType: "HASH"          
+          - AttributeName: "IpBlockflag"
+            KeyType: "HASH"
+          - AttributeName: "CreatedTimestamp"
+            KeyType: "RANGE"    
           Projection:
             ProjectionType: "ALL"
           ContributorInsightsSpecification:
             Enabled: "true"
           ProvisionedThroughput:
             ReadCapacityUnits: !Ref 'ReadCapacityUnits'
-            WriteCapacityUnits: !Ref 'WriteCapacityUnits'
+            WriteCapacityUnits: !Ref 'WriteCapacityUnits'        
