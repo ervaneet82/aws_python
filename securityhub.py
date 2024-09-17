@@ -1,23 +1,57 @@
 import boto3
+from datetime import datetime, timedelta
 import csv
 
-# Initialize a session using Amazon SecurityHub
+# Initialize a SecurityHub client
 client = boto3.client('securityhub')
 
-# Get findings
-response = client.get_findings()
+# Calculate the time 24 hours ago from the current time
+one_day_ago = datetime.now() - timedelta(days=1)
+one_day_ago_str = one_day_ago.strftime('%Y-%m-%dT%H:%M:%SZ')
 
-# Open a CSV file for writing
-with open('findings.csv', mode='w', newline='') as file:
-    writer = csv.writer(file)
-    # Write the header
-    writer.writerow(['Title', 'Severity', 'Account ID'])
+# Get the account ID from the current credentials
+account_id = boto3.client('sts').get_caller_identity().get('Account')
 
-    # Iterate through findings and write to CSV, excluding 'Info' severity
-    for finding in response['Findings']:
-        severity = finding['Severity']['Label']
-        if severity != 'INFORMATIONAL':
-            account_id = finding['AwsAccountId']
-            writer.writerow([finding['Title'], severity, account_id])
+# Function to fetch findings with pagination
+def fetch_findings():
+    findings = []
+    paginator = client.get_paginator('get_findings')
+    page_iterator = paginator.paginate(
+        Filters={
+            'RecordState': [{
+                'Value': 'ACTIVE',
+                'Comparison': 'EQUALS'
+            }],
+            'SeverityLabel': [{
+                'Value': 'INFORMATIONAL',
+                'Comparison': 'NOT_EQUALS'
+            }],
+            'UpdatedAt': [{
+                'Start': one_day_ago_str,
+                'Comparison': 'GREATER_THAN_OR_EQUAL'
+            }]
+        }
+    )
+    for page in page_iterator:
+        findings.extend(page['Findings'])
+    return findings
 
-print("CSV file 'findings.csv' created successfully.")
+# Fetch the findings
+findings = fetch_findings()
+
+# Write findings to CSV
+with open('security_hub_findings.csv', 'w', newline='') as file:
+    fieldnames = ['AccountId', 'Title', 'Description', 'Severity', 'UpdatedAt']
+    writer = csv.DictWriter(file, fieldnames=fieldnames)
+
+    writer.writeheader()
+    for finding in findings:
+        writer.writerow({
+            'AccountId': account_id,
+            'Title': finding.get('Title', ''),
+            'Description': finding.get('Description', ''),
+            'Severity': finding.get('Severity', {}).get('Label', ''),
+            'UpdatedAt': finding.get('UpdatedAt', '')
+        })
+
+print("CSV file has been created with the findings.")
