@@ -5,9 +5,9 @@ import csv
 # Initialize a SecurityHub client
 client = boto3.client('securityhub')
 
-# Calculate the time 24 hours ago from the current time
-one_day_ago = datetime.now() - timedelta(days=1)
-one_day_ago_str = one_day_ago.strftime('%Y-%m-%dT%H:%M:%SZ')
+# Calculate the time 2 hours ago from the current time
+two_hours_ago = datetime.now() - timedelta(hours=2)
+two_hours_ago_str = two_hours_ago.strftime('%Y-%m-%dT%H:%M:%SZ')
 now_str = datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
 
 # Get the account ID from the current credentials
@@ -28,7 +28,7 @@ def fetch_findings():
                 'Comparison': 'NOT_EQUALS'
             }],
             'UpdatedAt': [{
-                'Start': one_day_ago_str,
+                'Start': two_hours_ago_str,
                 'End': now_str
             }]
         }
