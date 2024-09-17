@@ -11,12 +11,13 @@ response = client.get_findings()
 with open('findings.csv', mode='w', newline='') as file:
     writer = csv.writer(file)
     # Write the header
-    writer.writerow(['Title', 'Severity'])
+    writer.writerow(['Title', 'Severity', 'Account ID'])
 
     # Iterate through findings and write to CSV, excluding 'Info' severity
     for finding in response['Findings']:
         severity = finding['Severity']['Label']
         if severity != 'INFORMATIONAL':
-            writer.writerow([finding['Title'], severity])
+            account_id = finding['AwsAccountId']
+            writer.writerow([finding['Title'], severity, account_id])
 
 print("CSV file 'findings.csv' created successfully.")
