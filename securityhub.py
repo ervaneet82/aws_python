@@ -8,6 +8,7 @@ client = boto3.client('securityhub')
 # Calculate the time 24 hours ago from the current time
 one_day_ago = datetime.now() - timedelta(days=1)
 one_day_ago_str = one_day_ago.strftime('%Y-%m-%dT%H:%M:%SZ')
+now_str = datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
 
 # Get the account ID from the current credentials
 account_id = boto3.client('sts').get_caller_identity().get('Account')
@@ -28,7 +29,7 @@ def fetch_findings():
             }],
             'UpdatedAt': [{
                 'Start': one_day_ago_str,
-                'Comparison': 'GREATER_THAN_OR_EQUAL'
+                'End': now_str
             }]
         }
     )
