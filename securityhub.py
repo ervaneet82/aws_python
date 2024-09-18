@@ -39,6 +39,7 @@ def fetch_findings():
 
 # Fetch the findings
 findings = fetch_findings()
+sorted_findings = sorted(findings, key=lambda x: x.get('Title', ''))
 
 # Write findings to CSV
 with open('security_hub_findings.csv', 'w', newline='') as file:
@@ -46,7 +47,7 @@ with open('security_hub_findings.csv', 'w', newline='') as file:
     writer = csv.DictWriter(file, fieldnames=fieldnames)
 
     writer.writeheader()
-    for finding in findings:
+    for finding in sorted_findings:
         writer.writerow({
             'AccountId': account_id,
             'Title': finding.get('Title', ''),
