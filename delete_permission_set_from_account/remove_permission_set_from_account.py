@@ -4,7 +4,7 @@ import argparse
 parser = argparse.ArgumentParser(description="Provide the information of account and permissionset to delete it.")
 parser.add_argument('-a','--account_id', type=int, help="AWS Account ID", required=True)
 parser.add_argument('-gname','--group_name', type=str, help="Group Name for permissionSet which we want to delete",required=True)
-parser.add_argument('-n','--permission_set_name', type=str, default="PermissionSet Name", help="The city where the person lives")
+parser.add_argument('-n','--permission_set_name', type=str, help="Permission Set Name which we want to de-attach or remove from account",required=True)
 
 # Parse arguments
 args = parser.parse_args()
